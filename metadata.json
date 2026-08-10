@@ -1,0 +1,6 @@
+{
+  "name": "Hospital Census Generator",
+  "description": "Real-time medical hospital occupancy tracker, LIS/EHR query schema integrator, and automated Excel reporting tool.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
