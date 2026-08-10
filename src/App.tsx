@@ -5,19 +5,51 @@ import { OccupancyTracker } from './components/OccupancyTracker';
 import { CensusGenerator } from './components/CensusGenerator';
 import { QuerySchemaStudio } from './components/QuerySchemaStudio';
 import { AiCensusInsights } from './components/AiCensusInsights';
-import { INITIAL_WARDS, MOCK_ORDERS } from './data/mockCensusData';
-import { DEFAULT_JSON_SCHEMAS } from './data/jsonSchemas';
-import { WardOccupancy, HCORDER, JsonQuerySchema } from './types';
+import { useFirebaseSync } from './hooks/useFirebaseSync';
+import { LoginScreen } from './components/LoginScreen';
+import { HCLABGenerator } from './components/HCLABGenerator';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'occupancy' | 'generator' | 'schema' | 'insights'>('home');
-  const [wards, setWards] = useState<WardOccupancy[]>(INITIAL_WARDS);
-  const [orders, setOrders] = useState<HCORDER[]>(MOCK_ORDERS);
-  const [schemas, setSchemas] = useState<JsonQuerySchema[]>(DEFAULT_JSON_SCHEMAS);
+
+  const {
+    user,
+    userRole,
+    authLoading,
+    firestoreConnected,
+    wards,
+    setWards,
+    orders,
+    schemas,
+    setSchemas,
+    saveSchemaToFirestore,
+    deleteSchemaFromFirestore,
+    loginWithGoogle,
+    loginWithEmail,
+    logoutUser
+  } = useFirebaseSync();
 
   const totalOccupiedBeds = wards.reduce((sum, w) => sum + w.occupiedBeds, 0);
   const totalCapacity = wards.reduce((sum, w) => sum + w.totalBeds, 0);
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f8fafc]">
+        <div className="text-slate-500 font-medium">Loading system...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <LoginScreen onLogin={loginWithEmail} />;
+  }
+
+  // If standard user, show the HCLAB Generator dialog ONLY
+  if (userRole !== 'admin') {
+    return <HCLABGenerator onLogout={logoutUser} orders={orders} schemas={schemas} />;
+  }
+
+  // If Admin, show the full dashboard
   return (
     <div className="min-h-screen bg-[#f8fafc] font-sans text-slate-800 selection:bg-teal-500 selection:text-white flex flex-col">
       
@@ -27,6 +59,11 @@ export default function App() {
         setActiveTab={setActiveTab}
         totalOccupiedBeds={totalOccupiedBeds}
         totalCapacity={totalCapacity}
+        user={user}
+        authLoading={authLoading}
+        loginWithGoogle={loginWithGoogle}
+        logoutUser={logoutUser}
+        firestoreConnected={firestoreConnected}
       />
 
       {/* Main Content Area */}
@@ -51,7 +88,12 @@ export default function App() {
         )}
 
         {activeTab === 'schema' && (
-          <QuerySchemaStudio schemas={schemas} setSchemas={setSchemas} />
+          <QuerySchemaStudio 
+            schemas={schemas} 
+            setSchemas={setSchemas}
+            saveSchemaToFirestore={saveSchemaToFirestore}
+            deleteSchemaFromFirestore={deleteSchemaFromFirestore}
+          />
         )}
 
         {activeTab === 'insights' && (

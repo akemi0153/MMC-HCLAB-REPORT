@@ -5,6 +5,8 @@ import { Database, Code2, Copy, Check, FileJson, Save, FileCheck, CheckCircle2, 
 interface QuerySchemaStudioProps {
   schemas: JsonQuerySchema[];
   setSchemas: React.Dispatch<React.SetStateAction<JsonQuerySchema[]>>;
+  saveSchemaToFirestore?: (schema: JsonQuerySchema) => Promise<void>;
+  deleteSchemaFromFirestore?: (schemaId: string) => Promise<void>;
 }
 
 interface ValidationResult {
@@ -23,7 +25,12 @@ interface ValidationResult {
   };
 }
 
-export const QuerySchemaStudio: React.FC<QuerySchemaStudioProps> = ({ schemas, setSchemas }) => {
+export const QuerySchemaStudio: React.FC<QuerySchemaStudioProps> = ({ 
+  schemas, 
+  setSchemas,
+  saveSchemaToFirestore,
+  deleteSchemaFromFirestore
+}) => {
   const [selectedSchemaId, setSelectedSchemaId] = useState<string>(schemas[0]?.id || 'lab-patient-count');
   const [copied, setCopied] = useState<boolean>(false);
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
@@ -72,6 +79,9 @@ export const QuerySchemaStudio: React.FC<QuerySchemaStudioProps> = ({ schemas, s
     };
 
     setSchemas(prev => [newSchema, ...prev]);
+    if (saveSchemaToFirestore) {
+      saveSchemaToFirestore(newSchema);
+    }
     setSelectedSchemaId(newId);
     setRawJsonText(JSON.stringify(newSchema, null, 2));
     setValidationResult(null);
@@ -86,6 +96,9 @@ export const QuerySchemaStudio: React.FC<QuerySchemaStudioProps> = ({ schemas, s
         return;
       }
       setSchemas(prev => [parsed, ...prev.filter(s => s.id !== parsed.id)]);
+      if (saveSchemaToFirestore) {
+        saveSchemaToFirestore(parsed);
+      }
       setSelectedSchemaId(parsed.id);
       setRawJsonText(JSON.stringify(parsed, null, 2));
       setShowImportModal(false);
@@ -107,6 +120,9 @@ export const QuerySchemaStudio: React.FC<QuerySchemaStudioProps> = ({ schemas, s
       const parsed = JSON.parse(rawJsonText) as JsonQuerySchema;
       const updated = schemas.map(s => s.id === parsed.id ? parsed : s);
       setSchemas(updated);
+      if (saveSchemaToFirestore) {
+        saveSchemaToFirestore(parsed);
+      }
       alert(`JSON Schema "${parsed.queryName}" saved successfully!`);
     } catch (e: any) {
       alert(`Invalid JSON Format: ${e.message}`);
@@ -136,6 +152,9 @@ export const QuerySchemaStudio: React.FC<QuerySchemaStudioProps> = ({ schemas, s
       }
       return filtered;
     });
+    if (deleteSchemaFromFirestore) {
+      deleteSchemaFromFirestore(targetId);
+    }
     setShowDeleteModal(false);
     setSchemaToDelete(null);
     setValidationResult(null);

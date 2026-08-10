@@ -1,0 +1,185 @@
+{
+  "entities": {
+    "WardOccupancy": {
+      "title": "Ward Occupancy",
+      "description": "Hospital ward bed capacity and occupancy tracking data.",
+      "type": "object",
+      "properties": {
+        "wardName": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "department": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "totalBeds": {
+          "type": "number"
+        },
+        "occupiedBeds": {
+          "type": "number"
+        },
+        "reservedBeds": {
+          "type": "number"
+        },
+        "availableBeds": {
+          "type": "number"
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "wardName",
+        "department",
+        "totalBeds",
+        "occupiedBeds",
+        "reservedBeds",
+        "availableBeds"
+      ]
+    },
+    "HCORDER": {
+      "title": "Lab Order",
+      "description": "Hospital clinical test order record from HCLAB / LIS / EHR.",
+      "type": "object",
+      "properties": {
+        "labNumber": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "mrn": {
+          "type": "string",
+          "maxLength": 64
+        },
+        "patientName": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "patientType": {
+          "type": "string",
+          "maxLength": 10
+        },
+        "status": {
+          "type": "string",
+          "maxLength": 30
+        },
+        "testCode": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "testName": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "trxDate": {
+          "type": "string",
+          "maxLength": 30
+        },
+        "updatedAt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "labNumber",
+        "mrn",
+        "patientName",
+        "patientType",
+        "status"
+      ]
+    },
+    "QuerySchema": {
+      "title": "Query Schema",
+      "description": "JSON schema definition for LIS/EHR query generation.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "queryName": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "department": {
+          "type": "string",
+          "maxLength": 50
+        },
+        "reportType": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "primaryTable": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "targetEhrDatabase": {
+          "type": "string",
+          "maxLength": 50
+        }
+      },
+      "required": [
+        "id",
+        "queryName",
+        "department",
+        "primaryTable"
+      ]
+    },
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Authenticated user profile and medical staff roles.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "role": {
+          "type": "string",
+          "maxLength": 50
+        }
+      },
+      "required": [
+        "uid",
+        "email"
+      ]
+    }
+  },
+  "firestore": {
+    "/wards/{wardId}": {
+      "schema": {
+        "$ref": "#/entities/WardOccupancy"
+      },
+      "description": "Collection of hospital ward bed occupancy data."
+    },
+    "/orders/{orderId}": {
+      "schema": {
+        "$ref": "#/entities/HCORDER"
+      },
+      "description": "Collection of hospital lab test orders and census entries."
+    },
+    "/query_schemas/{schemaId}": {
+      "schema": {
+        "$ref": "#/entities/QuerySchema"
+      },
+      "description": "Collection of JSON query schema definitions."
+    },
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Collection of authenticated staff user profiles."
+    }
+  }
+}

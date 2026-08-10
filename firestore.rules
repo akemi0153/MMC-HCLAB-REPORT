@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Ward Occupancy Collection
+    match /wards/{wardId} {
+      allow read: if true;
+      allow create, update: if isValidId(wardId)
+        && incoming().wardName is string
+        && incoming().wardName.size() <= 100
+        && incoming().department is string
+        && incoming().department.size() <= 50;
+      allow delete: if isValidId(wardId);
+    }
+
+    // Orders & Census Records Collection
+    match /orders/{orderId} {
+      allow read: if true;
+      allow create, update: if isValidId(orderId)
+        && incoming().labNumber is string
+        && incoming().labNumber.size() <= 64
+        && incoming().mrn is string
+        && incoming().mrn.size() <= 64;
+      allow delete: if isValidId(orderId);
+    }
+
+    // JSON Query Schemas Collection
+    match /query_schemas/{schemaId} {
+      allow read: if true;
+      allow create, update: if isValidId(schemaId)
+        && incoming().queryName is string
+        && incoming().queryName.size() <= 128
+        && incoming().primaryTable is string
+        && incoming().primaryTable.size() <= 100;
+      allow delete: if isValidId(schemaId);
+    }
+
+    // User Profiles Collection
+    match /users/{userId} {
+      allow read: if isSignedIn() && isValidId(userId);
+      allow create, update: if isSignedIn()
+        && isValidId(userId)
+        && request.auth.uid == userId
+        && incoming().email is string
+        && incoming().email.size() <= 128;
+      allow delete: if isSignedIn() && isValidId(userId) && request.auth.uid == userId;
+    }
+  }
+}
