@@ -44,11 +44,22 @@ export const HCLABGenerator: React.FC<HCLABGeneratorProps> = ({ onLogout, orders
       <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
         <div className="px-8 pt-8 pb-6 bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center">
-              <span className="text-3xl font-black text-white tracking-tighter">MM</span>
-              <div className="relative flex items-center justify-center">
-                <span className="text-3xl font-black text-white tracking-tighter">C</span>
-                <span className="text-xl font-black text-teal-500 absolute ml-1.5 -mt-1.5">+</span>
+            <div className="flex items-center h-10">
+              <img 
+                src="/logo.jpg" 
+                alt="Makati Medical Center" 
+                className="h-10 object-contain"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  document.getElementById('fallback-logo-gen')!.style.display = 'flex';
+                }}
+              />
+              <div id="fallback-logo-gen" style={{ display: 'none' }} className="items-center">
+                <span className="text-3xl font-black text-white tracking-tighter">MM</span>
+                <div className="relative flex items-center justify-center">
+                  <span className="text-3xl font-black text-white tracking-tighter">C</span>
+                  <span className="text-xl font-black text-teal-500 absolute ml-1.5 -mt-1.5">+</span>
+                </div>
               </div>
             </div>
             <div className="w-px h-8 bg-white/20"></div>

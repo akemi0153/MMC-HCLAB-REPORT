@@ -39,11 +39,22 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
     <div className="fixed inset-0 bg-slate-50 flex items-center justify-center p-4 z-50">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
         <div className="px-8 pt-10 pb-8 text-center bg-gradient-to-br from-slate-900 to-slate-800">
-          <div className="flex items-center justify-center mb-6">
-            <span className="text-5xl font-black text-white tracking-tighter">MM</span>
-            <div className="relative flex items-center justify-center">
-              <span className="text-5xl font-black text-white tracking-tighter">C</span>
-              <span className="text-3xl font-black text-teal-500 absolute ml-2 -mt-2">+</span>
+          <div className="flex items-center justify-center mb-6 h-16">
+            <img 
+              src="/logo.jpg" 
+              alt="Makati Medical Center" 
+              className="h-16 object-contain"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                document.getElementById('fallback-logo-login')!.style.display = 'flex';
+              }}
+            />
+            <div id="fallback-logo-login" style={{ display: 'none' }} className="items-center justify-center">
+              <span className="text-5xl font-black text-white tracking-tighter">MM</span>
+              <div className="relative flex items-center justify-center">
+                <span className="text-5xl font-black text-white tracking-tighter">C</span>
+                <span className="text-3xl font-black text-teal-500 absolute ml-2 -mt-2">+</span>
+              </div>
             </div>
           </div>
           <h2 className="text-2xl font-bold text-white tracking-tight">HCLAB Reports Generator</h2>
