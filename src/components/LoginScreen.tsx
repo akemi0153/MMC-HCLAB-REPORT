@@ -26,7 +26,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
     try {
       await onLogin(email, password);
     } catch (err: any) {
-      setError(err.message || 'Login failed');
+      if (err.code === 'auth/operation-not-allowed') {
+        setError('Email/Password login is not enabled in Firebase. Please go to the Firebase Console -> Authentication -> Sign-in method, and enable "Email/Password".');
+      } else {
+        setError(err.message || 'Login failed');
+      }
       setLoading(false);
     }
   };
